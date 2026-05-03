@@ -26,7 +26,7 @@ public:
 
 };
 
-double dot(const Vector& v1, const Vector& v2);
+
 
 
 Vector operator+(const Vector& a, const Vector& b);

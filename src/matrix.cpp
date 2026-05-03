@@ -1,4 +1,4 @@
-#include "ml/matrix.h"
+#include "ml/Matrix.h"
 
 #include <utility>
 #include <stdexcept>

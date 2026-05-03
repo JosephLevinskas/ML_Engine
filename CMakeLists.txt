@@ -8,8 +8,9 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Main compile
 add_library(ml_core
-    src/vector.cpp
-    src/matrix.cpp 
+    src/Vector.cpp
+    src/Matrix.cpp 
+    src/Operations.cpp
 )
 
 target_include_directories(ml_core
@@ -17,6 +18,7 @@ target_include_directories(ml_core
 )
 
 enable_testing()
+
 
 # Vector
 add_executable(vector_tests
@@ -29,6 +31,7 @@ target_link_libraries(vector_tests
 
 add_test(NAME VectorTests COMMAND vector_tests)
 
+
 # Matrix
 add_executable(matrix_tests
     tests/MatrixTests.cpp
@@ -39,3 +42,15 @@ target_link_libraries(matrix_tests
 )
 
 add_test(NAME MatrixTests COMMAND matrix_tests)
+
+
+# Operations 
+add_executable(operations_tests
+    tests/OperationsTests.cpp
+)
+
+target_link_libraries(operations_tests
+    PRIVATE ml_core
+)
+
+add_test(NAME OperationsTests COMMAND operations_tests)

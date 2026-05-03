@@ -1,4 +1,4 @@
-#include "ml/vector.h"
+#include "ml/Vector.h"
 
 #include <stdexcept>
 #include <utility>
@@ -31,22 +31,6 @@ double& Vector::operator[](size_t index) {
     return data[index];
 }
 
-double dot(const Vector& v1, const Vector& v2) {
-    const size_t size = v1.size();
-
-    if (size != v2.size()) {
-        throw std::invalid_argument("Vector sizes must match for dot product");
-    }
-
-    double sum = 0.0;
-
-    for (size_t i = 0; i < size; ++i) {
-        sum += v1[i] * v2[i];
-    }
-
-    return sum;
-
-}
 
 Vector& Vector::operator+=(const Vector& other) {
     size_t size = data.size();
