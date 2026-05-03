@@ -21,7 +21,8 @@ public:
     Vector& operator+=(const Vector& other);
     Vector& operator-=(const Vector& other);
     Vector& operator*=(double scalar);
-    
+    Vector& operator+=(double scalar);
+
     
 
 };
@@ -33,4 +34,6 @@ Vector operator+(const Vector& a, const Vector& b);
 Vector operator-(const Vector& a, const Vector& b);
 Vector operator*(const Vector& v, double scalar);
 Vector operator*(double scalar, const Vector& v);
+Vector operator+(const Vector& v, double scalar);
+Vector operator+(double scalar, const Vector& v);
 }

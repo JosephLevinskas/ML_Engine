@@ -82,4 +82,21 @@ Vector operator*(const Vector& v, double scalar) {
 Vector operator*(double scalar, const Vector& v) {
     return v * scalar;
 }
+
+Vector& Vector::operator+=(double scalar) {
+    size_t size = data.size();
+    for (size_t i = 0; i < size; ++i) {
+        data[i] += scalar;
+    }
+    return *this;
+}
+
+Vector operator+(const Vector& v, double scalar) {
+    Vector newV = v;
+    return newV += scalar;
+}
+
+Vector operator+(double scalar, const Vector& v) {
+    return v + scalar;
+}
 }

@@ -180,6 +180,62 @@ void test_non_mutating_operators_do_not_change_inputs() {
     assert(b[2] == 6.0);
 }
 
+void test_scalar_add_assign() {
+    Vector v({1.0, 2.0, 3.0});
+
+    v += 10.0;
+
+    assert(v[0] == 11.0);
+    assert(v[1] == 12.0);
+    assert(v[2] == 13.0);
+}
+
+void test_vector_plus_scalar() {
+    Vector v({1.0, 2.0, 3.0});
+
+    Vector result = v + 5.0;
+
+    assert(result[0] == 6.0);
+    assert(result[1] == 7.0);
+    assert(result[2] == 8.0);
+}
+
+void test_scalar_plus_vector() {
+    Vector v({1.0, 2.0, 3.0});
+
+    Vector result = 5.0 + v;
+
+    assert(result[0] == 6.0);
+    assert(result[1] == 7.0);
+    assert(result[2] == 8.0);
+}
+
+void test_add_zero_scalar() {
+    Vector v({4.0, -2.0, 7.5});
+
+    Vector result = v + 0.0;
+
+    assert(result[0] == 4.0);
+    assert(result[1] == -2.0);
+    assert(result[2] == 7.5);
+}
+
+void test_add_scalar_does_not_mutate_original() {
+    Vector v({1.0, 2.0, 3.0});
+
+    Vector result = v + 10.0;
+
+    // original unchanged
+    assert(v[0] == 1.0);
+    assert(v[1] == 2.0);
+    assert(v[2] == 3.0);
+
+    // result correct
+    assert(result[0] == 11.0);
+    assert(result[1] == 12.0);
+    assert(result[2] == 13.0);
+}
+
 int main() {
     test_constructor_valid();
     test_constructor_empty_throws();
@@ -198,7 +254,11 @@ int main() {
     test_vector_scalar_multiply();
     test_scalar_vector_multiply();
     test_non_mutating_operators_do_not_change_inputs();
-
+    test_scalar_add_assign();
+    test_vector_plus_scalar();
+    test_scalar_plus_vector();
+    test_add_zero_scalar();
+    test_add_scalar_does_not_mutate_original();
     std::cout << "All Vector tests passed.\n";
     return 0;
 }

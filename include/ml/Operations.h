@@ -9,4 +9,5 @@ double dot(const Vector& v1, const Vector& v2);
 
 Vector operator*(const Matrix&, const Vector&);
 
+
 }

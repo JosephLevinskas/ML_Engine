@@ -11,6 +11,7 @@ add_library(ml_core
     src/Vector.cpp
     src/Matrix.cpp 
     src/Operations.cpp
+    src/LinearModel.cpp
 )
 
 target_include_directories(ml_core
@@ -54,3 +55,15 @@ target_link_libraries(operations_tests
 )
 
 add_test(NAME OperationsTests COMMAND operations_tests)
+
+
+# LinearModel
+add_executable(linearmodel_tests
+    tests/LinearModelTests.cpp
+)
+
+target_link_libraries(linearmodel_tests
+    PRIVATE ml_core
+)
+
+add_test(NAME LinearModelTests COMMAND linearmodel_tests)
