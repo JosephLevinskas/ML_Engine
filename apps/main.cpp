@@ -10,12 +10,11 @@
 using namespace machineLearning;
 
 int main() {
-    // --- TRUE MODEL (what we want to learn) ---
-    // y = 3*x1 + 5*x2 + 2
+    // --- TRUE MODEL ---
     Vector trueWeights({3.0, 5.0});
     double trueBias = 2.0;
 
-    // --- CREATE DATASET ---
+    // --- DATASET ---
     const size_t rows = 1000;
     const size_t cols = 2;
 
@@ -39,33 +38,49 @@ int main() {
     Matrix X(rows, cols, std::move(data));
     Vector targets(std::move(targetData));
 
-    // --- INITIAL MODEL (bad guess) ---
+    // --- INITIAL MODEL ---
     LinearModel model(Vector({0.1, 0.1}), 0.0);
 
-    std::cout << "Initial Weights:\n";
-    std::cout << model.getWeights()[0] << ", " << model.getWeights()[1] << "\n";
+    std::cout << "Initial Weights: "
+              << model.getWeights()[0] << ", "
+              << model.getWeights()[1] << "\n";
+
     std::cout << "Initial Bias: " << model.getBias() << "\n";
 
     double initialLoss = meanSquaredError(model.predict(X), targets);
-    std::cout << "\nInitial Loss: " << initialLoss << "\n";
+    std::cout << "Initial Loss: " << initialLoss << "\n";
 
     // --- TRAIN ---
-    Trainer trainer(0.1, 1000); // small LR because data is large
+    Trainer trainer(0.1, 1000);
 
-    LinearModel trained = trainer.train(model, X, targets);
+    TrainingResults result = trainer.train(model, X, targets);
+    const LinearModel& trained = result.model;
 
     // --- RESULTS ---
-    std::cout << "\nTrained Weights:\n";
-    std::cout << trained.getWeights()[0] << ", " << trained.getWeights()[1] << "\n";
+    std::cout << "\nTrained Weights: "
+              << trained.getWeights()[0] << ", "
+              << trained.getWeights()[1] << "\n";
 
     std::cout << "Trained Bias: " << trained.getBias() << "\n";
 
     double finalLoss = meanSquaredError(trained.predict(X), targets);
-    std::cout << "\nFinal Loss: " << finalLoss << "\n";
+    std::cout << "Final Loss: " << finalLoss << "\n";
+
+    // --- LOSS PROGRESSION ---
+    std::cout << "\nLoss progression:\n";
+    std::cout << "Start: " << result.losses.front() << "\n";
+    std::cout << "End:   " << result.losses.back() << "\n";
+
+    // Optional: print every 100 epochs
+    std::cout << "\nSampled Losses:\n";
+    for (size_t i = 0; i < result.losses.size(); i += 100) {
+        std::cout << "Epoch " << i << ": " << result.losses[i] << "\n";
+    }
 
     // --- TRUE VALUES ---
-    std::cout << "\nTrue Weights:\n";
-    std::cout << trueWeights[0] << ", " << trueWeights[1] << "\n";
+    std::cout << "\nTrue Weights: "
+              << trueWeights[0] << ", "
+              << trueWeights[1] << "\n";
 
     std::cout << "True Bias: " << trueBias << "\n";
 

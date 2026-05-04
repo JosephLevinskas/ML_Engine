@@ -6,6 +6,11 @@
 
 namespace machineLearning {
 
+struct TrainingResults {
+    LinearModel model;
+    std::vector<double> losses;
+};
+
 class Trainer {
 private:
     double learningRate;
@@ -14,7 +19,7 @@ private:
 public:
     Trainer(double learningRate_, size_t epochs_);
 
-    LinearModel train(const LinearModel& model,
+    TrainingResults train(const LinearModel& model,
                         const Matrix& X,
                         const Vector& Targets) const;
 };

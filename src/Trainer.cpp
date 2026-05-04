@@ -1,5 +1,6 @@
 #include "ml/Trainer.h"
 #include "ml/Gradients.h"
+#include "ml/LossFunctions.h"
 
 #include <utility>
 #include <stdexcept>
@@ -17,17 +18,21 @@ Trainer::Trainer(double learningRate_, size_t epochs_)
     }
 }
 
-LinearModel Trainer::train(const LinearModel& model, const Matrix& X, const Vector& targets) const {
+TrainingResults Trainer::train(const LinearModel& model, const Matrix& X, const Vector& targets) const {
     LinearModel current = model;
+    std::vector<double> losses;
+    losses.reserve(epochs);
     
     for (size_t i = 0; i < epochs; ++i) {
         Vector predictions = current.predict(X);
+        double loss = meanSquaredError(predictions, targets);
+        losses.push_back(loss);
         LinearModelGradients gradients = computeLinearModelMSEGradients(X, predictions, targets);
         Vector updatedWeights = (current.getWeights() - (learningRate * gradients.weightGradients));
         double updatedBias = (current.getBias() - (learningRate * gradients.biasGradient));
         current = LinearModel(std::move(updatedWeights), updatedBias);
     }
-    return current;
+    return {std::move(current), std::move(losses)};
 }
 
 }
