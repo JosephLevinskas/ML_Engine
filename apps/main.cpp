@@ -2,71 +2,72 @@
 #include "ml/Vector.h"
 #include "ml/LinearModel.h"
 #include "ml/LossFunctions.h"
-#include "ml/Gradients.h"
-#include "ml/Operations.h"
+#include "ml/Trainer.h"
 
 #include <iostream>
+#include <vector>
 
 using namespace machineLearning;
 
 int main() {
-    // 1. Create dataset (2 samples, 2 features)
-    Matrix X(2, 2, {
-        1.0, 2.0,
-        3.0, 4.0
-    });
+    // --- TRUE MODEL (what we want to learn) ---
+    // y = 3*x1 + 5*x2 + 2
+    Vector trueWeights({3.0, 5.0});
+    double trueBias = 2.0;
 
-    Vector targets({8.0, 18.0});
+    // --- CREATE DATASET ---
+    const size_t rows = 1000;
+    const size_t cols = 2;
 
-    // 2. Initialize model
-    // Let's say: prediction = 1*x1 + 2*x2 + 0
-    LinearModel model(Vector({1.0, 2.0}), 0.0);
+    std::vector<double> data;
+    data.reserve(rows * cols);
 
-    // 3. Forward pass
-    Vector predictions = model.predict(X);
+    std::vector<double> targetData;
+    targetData.reserve(rows);
 
-    std::cout << "Predictions:\n";
-    for (size_t i = 0; i < predictions.size(); ++i) {
-        std::cout << predictions[i] << "\n";
+    for (size_t i = 0; i < rows; ++i) {
+        double x1 = static_cast<double>(i) / 1000.0;
+        double x2 = static_cast<double>(i % 10) / 10.0;
+
+        data.push_back(x1);
+        data.push_back(x2);
+
+        double y = x1 * trueWeights[0] + x2 * trueWeights[1] + trueBias;
+        targetData.push_back(y);
     }
 
-    // 4. Compute loss
-    double loss = meanSquaredError(predictions, targets);
-    std::cout << "\nMSE Loss: " << loss << "\n";
+    Matrix X(rows, cols, std::move(data));
+    Vector targets(std::move(targetData));
 
-    // 5. Compute gradients
-    LinearModelGradients grads =
-        computeLinearModelMSEGradients(X, predictions, targets);
+    // --- INITIAL MODEL (bad guess) ---
+    LinearModel model(Vector({0.1, 0.1}), 0.0);
 
-    std::cout << "\nWeight Gradients:\n";
-    for (size_t i = 0; i < grads.weightGradients.size(); ++i) {
-        std::cout << grads.weightGradients[i] << "\n";
-    }
+    std::cout << "Initial Weights:\n";
+    std::cout << model.getWeights()[0] << ", " << model.getWeights()[1] << "\n";
+    std::cout << "Initial Bias: " << model.getBias() << "\n";
 
-    std::cout << "\nBias Gradient:\n";
-    std::cout << grads.biasGradient << "\n";
+    double initialLoss = meanSquaredError(model.predict(X), targets);
+    std::cout << "\nInitial Loss: " << initialLoss << "\n";
 
-    const double learningRate = 0.01;
+    // --- TRAIN ---
+    Trainer trainer(0.1, 1000); // small LR because data is large
 
-    Vector updatedWeights =
-        Vector({1.0, 2.0}) - (grads.weightGradients * learningRate);
+    LinearModel trained = trainer.train(model, X, targets);
 
-    double updatedBias =
-        0.0 - learningRate * grads.biasGradient;
+    // --- RESULTS ---
+    std::cout << "\nTrained Weights:\n";
+    std::cout << trained.getWeights()[0] << ", " << trained.getWeights()[1] << "\n";
 
-    LinearModel updatedModel(updatedWeights, updatedBias);
+    std::cout << "Trained Bias: " << trained.getBias() << "\n";
 
-    Vector updatedPredictions = updatedModel.predict(X);
+    double finalLoss = meanSquaredError(trained.predict(X), targets);
+    std::cout << "\nFinal Loss: " << finalLoss << "\n";
 
-    double updatedLoss = meanSquaredError(updatedPredictions, targets);
+    // --- TRUE VALUES ---
+    std::cout << "\nTrue Weights:\n";
+    std::cout << trueWeights[0] << ", " << trueWeights[1] << "\n";
 
-    std::cout << "\nUpdated Predictions:\n";
-    for (size_t i = 0; i < updatedPredictions.size(); ++i) {
-        std::cout << updatedPredictions[i] << "\n";
-    }
-
-    std::cout << "\nUpdated MSE Loss:\n";
-    std::cout << updatedLoss << "\n";
+    std::cout << "True Bias: " << trueBias << "\n";
 
     return 0;
 }

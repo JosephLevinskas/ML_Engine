@@ -16,6 +16,14 @@ LinearModel::LinearModel(Vector weights_, double bias_)
     }
 }
 
+const Vector& LinearModel::getWeights() const {
+    return weights;
+}
+
+const double LinearModel::getBias() const {
+    return bias;
+}
+
 double LinearModel::predict(const Vector& x) const{
     if (x.size() != weights.size()) {
         throw std::invalid_argument("Input vector size must match weight size");

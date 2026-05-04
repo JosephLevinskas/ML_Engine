@@ -14,6 +14,7 @@ add_library(ml_core
     src/LinearModel.cpp
     src/LossFunctions.cpp
     src/Gradients.cpp
+    src/Trainer.cpp
 )
 
 target_include_directories(ml_core
@@ -103,3 +104,15 @@ target_link_libraries(gradients_tests
 )
 
 add_test(NAME GradientsTests COMMAND gradients_tests)
+
+
+# Trainer
+add_executable(trainer_tests
+    tests/TrainerTests.cpp
+)
+
+target_link_libraries(trainer_tests
+    PRIVATE ml_core
+)
+
+add_test(NAME TrainerTests COMMAND trainer_tests)

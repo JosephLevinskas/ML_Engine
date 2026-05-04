@@ -13,6 +13,9 @@ private:
 public:
     LinearModel(Vector weights_, double bias);
 
+    const Vector& getWeights() const;
+    const double getBias() const;
+
     double predict(const Vector& x) const;
     Vector predict(const Matrix& x) const;
 };
