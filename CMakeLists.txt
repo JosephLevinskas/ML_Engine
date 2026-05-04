@@ -15,6 +15,7 @@ add_library(ml_core
     src/LossFunctions.cpp
     src/Gradients.cpp
     src/Trainer.cpp
+    src/StandardScaler.cpp
 )
 
 target_include_directories(ml_core
@@ -116,3 +117,15 @@ target_link_libraries(trainer_tests
 )
 
 add_test(NAME TrainerTests COMMAND trainer_tests)
+
+
+# Trainer
+add_executable(standard_scaler_tests
+    tests/StandardScalerTests.cpp
+)
+
+target_link_libraries(standard_scaler_tests
+    PRIVATE ml_core
+)
+
+add_test(NAME StandardScaler COMMAND standard_scaler_tests)
