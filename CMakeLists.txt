@@ -12,6 +12,8 @@ add_library(ml_core
     src/Matrix.cpp 
     src/Operations.cpp
     src/LinearModel.cpp
+    src/LossFunctions.cpp
+    src/Gradients.cpp
 )
 
 target_include_directories(ml_core
@@ -19,6 +21,16 @@ target_include_directories(ml_core
 )
 
 enable_testing()
+
+
+# Main
+add_executable(main
+    apps/main.cpp
+)
+
+target_link_libraries(main
+    PRIVATE ml_core
+)
 
 
 # Vector
@@ -67,3 +79,27 @@ target_link_libraries(linearmodel_tests
 )
 
 add_test(NAME LinearModelTests COMMAND linearmodel_tests)
+
+
+# LossFunction
+add_executable(loss_functions_tests
+    tests/LossFunctionsTests.cpp
+)
+
+target_link_libraries(loss_functions_tests
+    PRIVATE ml_core
+)
+
+add_test(NAME LossFunctionsTests COMMAND loss_functions_tests)
+
+
+# Gradients
+add_executable(gradients_tests
+    tests/GradientsTests.cpp
+)
+
+target_link_libraries(gradients_tests
+    PRIVATE ml_core
+)
+
+add_test(NAME GradientsTests COMMAND gradients_tests)
