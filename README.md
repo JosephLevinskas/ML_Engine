@@ -1,107 +1,142 @@
 # ML Engine
 
-A production-level Machine Learning engine built from scratch in C++. This is a long-term project focused on deep understanding of mathematics, algorithms, and systems design.
+A production-level Machine Learning engine built from first principles in modern C++. This repository is focused on rigorous math, clean architecture, and minimal dependencies.
 
-## Learning Approach
+## Engineering Approach
 
-This project follows a senior engineering methodology:
+This project is structured like a senior-engineer codebase:
 
-- **Explain WHY before HOW**: Every decision is justified mathematically and architecturally.
-- **Design questions first**: Critical thinking about trade-offs precedes implementation.
-- **Incremental progress**: Build and test step-by-step, no shortcuts.
-- **Strict correctness**: Mathematical accuracy and clean architecture are non-negotiable.
-- **Minimal implementations**: No unnecessary code, abstractions, or dependencies.
-- **First principles**: Everything built from fundamental concepts, tied directly to ML applications.
+- **WHY before HOW**: Every interface and implementation is justified by algorithmic behavior and ML requirements.
+- **Design questions first**: Before implementing, we question dimension correctness, performance trade-offs, and invariants.
+- **Incremental correctness**: Build one primitive at a time, with tests driving each step.
+- **Minimal abstractions**: No unnecessary layers, no hidden allocations, no external ML frameworks.
+- **Production-minded**: Clean API, clear ownership, and explicit error handling.
 
-## Project Goals
+## Current Project Goals
 
 Build a complete ML system from scratch in C++:
 
-- **No ML libraries**: No PyTorch, TensorFlow, or similar dependencies.
-- **Minimal dependencies**: Only standard C++ and CMake.
-- **Fully tested**: Comprehensive test suite for all components.
-- **Clean architecture**: Production-quality design like a real ML framework.
+- No external ML libraries (PyTorch, TensorFlow, etc.)
+- Minimal dependencies: Standard C++ and CMake only
+- Thorough tests for every module
+- Clear, maintainable architecture suitable for real systems
 
-## Planned Progression
+## Progress Status
 
 1. ✅ Vector math system
-2. ✅ Matrix system (core completed)
-3. Linear regression (gradient descent)
-4. Logistic regression
-5. Loss functions and optimization
-6. Neural networks (forward + backpropagation)
-7. Training loops and evaluation
-8. Real-world project (audio-related application)
+2. ✅ Matrix system
+3. ✅ Matrix × Vector multiplication and dot product operations
+4. ✅ Linear prediction model (`LinearModel`)
+5. ✅ Mean squared error loss
+6. ✅ Gradient computation for linear models
+7. ⬜ Gradient descent training loop
+8. ⬜ Logistic regression
+9. ⬜ Neural network layers and backpropagation
+10. ⬜ Training loop, evaluation, and application
 
-## Architecture
+## Current Architecture
 
 ```
 ml_engine/
-├── include/ml/
-│   ├── Vector.h
-│   └── Matrix.h
-├── src/
-│   ├── Vector.cpp
-│   └── Matrix.cpp
-├── tests/
-│   ├── VectorTests.cpp
-│   └── MatrixTests.cpp
 ├── apps/
 │   └── main.cpp
+├── include/ml/
+│   ├── Gradients.h
+│   ├── LinearModel.h
+│   ├── LossFunctions.h
+│   ├── Matrix.h
+│   ├── Operations.h
+│   └── Vector.h
+├── src/
+│   ├── Gradients.cpp
+│   ├── LinearModel.cpp
+│   ├── LossFunctions.cpp
+│   ├── Matrix.cpp
+│   ├── Operations.cpp
+│   └── Vector.cpp
+├── tests/
+│   ├── GradientsTests.cpp
+│   ├── LinearModelTests.cpp
+│   ├── LossFunctionsTests.cpp
+│   ├── MatrixTests.cpp
+│   ├── OperationsTests.cpp
+│   └── VectorTests.cpp
 ├── CMakeLists.txt
+├── LICENSE
 └── README.md
 ```
 
-Built with CMake for proper build/test infrastructure.
+## Implemented Components
 
-## Completed Components
+### Vector
 
-### Vector (COMPLETE)
+- `Vector` stores data as `std::vector<double>`.
+- Enforces non-empty construction.
+- Provides bounds-checked access.
+- Supports core arithmetic and dot-product semantics.
+- Designed for safe, predictable primitive operations.
 
-**Design Decisions:**
-- Storage: `std::vector<double>` for contiguous memory and standard library compatibility.
-- Invariants: Rejects empty vectors at construction.
-- Safety: Bounds-checked indexing via `operator[]`.
-- Math operations: Dot product as free function, arithmetic operators (`+`, `-`, `*` scalar, compound assignments).
-- Efficiency: Free functions reuse compound operators (single source of truth), no hidden allocations in primitives.
-- Syntax: Clean mathematical notation (`v[i]`, `a + b`).
+### Matrix
 
-**Key Principle:** Public API is safe, inner math is clean and efficient.
+- `Matrix` stores contiguous row-major data.
+- Invariants: positive row and column counts.
+- Access via `matrix(row, col)` with bounds checks.
+- No `Vector` dependency inside storage.
+- Designed for efficient linear algebra primitives.
 
-### Matrix (CORE COMPLETED)
+### Operations
 
-**Design Decisions:**
-- Storage: Contiguous `std::vector<double>` in row-major order.
-- Abstraction: Does NOT use `Vector` internally (proper separation of concerns).
-- Invariants: `rows > 0`, `cols > 0`.
-- Indexing: `matrix(row, col)` with internal mapping `row * cols + col`.
-- Safety: Bounds checking throws `std::out_of_range`.
-- Constructors: `(rows, cols)` for zero-initialized, `(rows, cols, data)` with size validation.
+- `dot(Vector, Vector)` validates size and computes the inner product.
+- `Matrix * Vector` implements linear algebra multiplication.
+- This is the exact primitive behind `predictions = X * weights`.
+- Dimension checks are enforced and reported via exceptions.
 
-**Key Principle:** Storage is low-level and contiguous for performance. Abstraction enforced at interface.
+### LinearModel
 
-## Current Understanding
+- `LinearModel` stores `weights` and `bias`.
+- Supports single-sample prediction `predict(Vector)`.
+- Supports batch prediction `predict(Matrix)`.
+- Uses matrix-vector multiplication for batched inference.
+- Validates feature dimension alignment.
 
-- **Dot product**: Core ML primitive for similarity and projections.
-- **ML fundamentals**: Parameter optimization to minimize loss functions.
-- **Data layout**: Rows = samples, columns = features (standard ML convention).
-- **Performance**: Contiguous memory and allocation avoidance critical early.
-- **Architecture**: Clear separation between storage efficiency and abstraction safety.
-- **Code quality**: Operator design directly impacts readability and mathematical correctness.
+### LossFunctions
 
-## Building and Testing
+- `meanSquaredError(predictions, targets)` computes the standard MSE.
+- Validates matching vector lengths.
+- Provides scalar loss for regression evaluation.
+
+### Gradients
+
+- `computeLinearModelMSEGradients(X, predictions, targets)` computes gradients for linear regression.
+- Returns both weight gradients and bias gradient.
+- Uses explicit matrix/vector math with no external helpers.
+- This is the next step before adding gradient descent.
+
+## Testing
+
+Every component has a dedicated executable and test file:
+
+- `vector_tests`
+- `matrix_tests`
+- `operations_tests`
+- `linearmodel_tests`
+- `loss_functions_tests`
+- `gradients_tests`
+
+Tests verify correct results, dimension mismatches, and edge-case behavior.
+
+## Build and Run
 
 ```bash
-# Configure
 cd build
 cmake ..
-
-# Build
 cmake --build . --config Release
-
-# Test
 ctest -C Release
 ```
+
+## Next Immediate Step
+
+The current codebase has prediction and loss primitives in place. The next concrete step is to implement a training loop using gradient descent to update `LinearModel` parameters from `X`, `y`, and MSE.
 
 ## License
 
