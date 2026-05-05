@@ -29,10 +29,12 @@ Build a complete ML system from scratch in C++:
 4. ✅ Linear prediction model (`LinearModel`)
 5. ✅ Mean squared error loss
 6. ✅ Gradient computation for linear models
-7. ⬜ Gradient descent training loop
-8. ⬜ Logistic regression
-9. ⬜ Neural network layers and backpropagation
-10. ⬜ Training loop, evaluation, and application
+7. ✅ Gradient descent training loop (`Trainer`)
+8. ✅ Feature scaling (`StandardScaler`)
+9. ✅ Linear regression pipeline (`LinearRegressionPipeline`)
+10. ⬜ Logistic regression
+11. ⬜ Neural network layers and backpropagation
+12. ⬜ Training loop, evaluation, and application
 
 ## Current Architecture
 
@@ -43,23 +45,32 @@ ml_engine/
 ├── include/ml/
 │   ├── Gradients.h
 │   ├── LinearModel.h
+│   ├── LinearRegressionPipeline.h
 │   ├── LossFunctions.h
 │   ├── Matrix.h
 │   ├── Operations.h
+│   ├── StandardScaler.h
+│   ├── Trainer.h
 │   └── Vector.h
 ├── src/
 │   ├── Gradients.cpp
 │   ├── LinearModel.cpp
+│   ├── LinearRegressionPipeline.cpp
 │   ├── LossFunctions.cpp
 │   ├── Matrix.cpp
 │   ├── Operations.cpp
+│   ├── StandardScaler.cpp
+│   ├── Trainer.cpp
 │   └── Vector.cpp
 ├── tests/
 │   ├── GradientsTests.cpp
 │   ├── LinearModelTests.cpp
+│   ├── LinearRegressionPipelineTests.cpp
 │   ├── LossFunctionsTests.cpp
 │   ├── MatrixTests.cpp
 │   ├── OperationsTests.cpp
+│   ├── StandardScalerTests.cpp
+│   ├── TrainerTests.cpp
 │   └── VectorTests.cpp
 ├── CMakeLists.txt
 ├── LICENSE
@@ -112,6 +123,27 @@ ml_engine/
 - Uses explicit matrix/vector math with no external helpers.
 - This is the next step before adding gradient descent.
 
+### Trainer
+
+- `Trainer` implements gradient descent optimization.
+- Configurable learning rate and maximum epochs.
+- Tracks loss progression during training.
+- Updates model parameters iteratively to minimize loss.
+
+### StandardScaler
+
+- `StandardScaler` performs feature standardization (z-score normalization).
+- Computes mean and standard deviation from training data.
+- Transforms features to zero mean and unit variance.
+- Essential preprocessing step for gradient-based optimization.
+
+### LinearRegressionPipeline
+
+- `LinearRegressionPipeline` combines scaling and training into a complete workflow.
+- Integrates `StandardScaler` and `Trainer` with `LinearModel`.
+- Provides end-to-end training and prediction capabilities.
+- Demonstrates a production-ready ML pipeline.
+
 ## Testing
 
 Every component has a dedicated executable and test file:
@@ -122,6 +154,9 @@ Every component has a dedicated executable and test file:
 - `linearmodel_tests`
 - `loss_functions_tests`
 - `gradients_tests`
+- `trainer_tests`
+- `standard_scaler_tests`
+- `linear_regression_pipeline_tests`
 
 Tests verify correct results, dimension mismatches, and edge-case behavior.
 
@@ -134,9 +169,25 @@ cmake --build . --config Release
 ctest -C Release
 ```
 
+### Demo Application
+
+The `apps/main.cpp` demonstrates a complete linear regression pipeline:
+
+- Generates synthetic training data
+- Trains a linear model using gradient descent
+- Evaluates performance on training data
+- Makes predictions on new data
+- Shows loss progression during training
+
+Run the demo with:
+
+```bash
+./Release/main.exe
+```
+
 ## Next Immediate Step
 
-The current codebase has prediction and loss primitives in place. The next concrete step is to implement a training loop using gradient descent to update `LinearModel` parameters from `X`, `y`, and MSE.
+The current codebase has a complete linear regression pipeline with training, scaling, and prediction. The next concrete steps are to implement logistic regression for binary classification, including sigmoid activation, binary cross-entropy loss, and corresponding gradients.
 
 ## License
 
