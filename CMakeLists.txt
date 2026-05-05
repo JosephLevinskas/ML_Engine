@@ -16,6 +16,7 @@ add_library(ml_core
     src/Gradients.cpp
     src/Trainer.cpp
     src/StandardScaler.cpp
+    src/LinearRegressionPipeline.cpp
 )
 
 target_include_directories(ml_core
@@ -129,3 +130,15 @@ target_link_libraries(standard_scaler_tests
 )
 
 add_test(NAME StandardScaler COMMAND standard_scaler_tests)
+
+
+# LinearRegressionPipeline
+add_executable(linear_regression_pipeline_tests
+    tests/LinearRegressionPipelineTests.cpp
+)
+
+target_link_libraries(linear_regression_pipeline_tests
+    PRIVATE ml_core
+)
+
+add_test(NAME LinearRegressionPipeline COMMAND linear_regression_pipeline_tests)

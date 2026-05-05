@@ -1,9 +1,9 @@
 #include "ml/Matrix.h"
 #include "ml/Vector.h"
 #include "ml/LinearModel.h"
-#include "ml/LossFunctions.h"
 #include "ml/Trainer.h"
-#include "ml/StandardScaler.h"
+#include "ml/LossFunctions.h"
+#include "ml/LinearRegressionPipeline.h"
 
 #include <iostream>
 #include <vector>
@@ -11,7 +11,7 @@
 using namespace machineLearning;
 
 int main() {
-    std::cout << "=== ML ENGINE DEMO ===\n\n";
+    std::cout << "=== LINEAR REGRESSION PIPELINE DEMO ===\n\n";
 
     // --- TRUE MODEL ---
     Vector trueWeights({3.0, 5.0});
@@ -22,9 +22,9 @@ int main() {
     const size_t cols = 2;
 
     std::vector<double> data;
-    data.reserve(rows * cols);
-
     std::vector<double> targetData;
+
+    data.reserve(rows * cols);
     targetData.reserve(rows);
 
     for (size_t i = 0; i < rows; ++i) {
@@ -34,77 +34,83 @@ int main() {
         data.push_back(x1);
         data.push_back(x2);
 
-        double y = x1 * trueWeights[0] + x2 * trueWeights[1] + trueBias;
+        double y = 3.0 * x1 + 5.0 * x2 + 2.0;
         targetData.push_back(y);
     }
 
     Matrix X(rows, cols, std::move(data));
-    Vector targets(std::move(targetData));
+    Vector y(std::move(targetData));
 
-    // --- SCALER (WORKAROUND CONSTRUCTOR) ---
-    StandardScaler scaler(
-        Vector({0.0, 0.0}),   // dummy means
-        Vector({1.0, 1.0}),   // dummy stds
-        false                 // not fitted yet
-    );
-
-    Matrix scaledX = scaler.fitTransform(X);
-
-    std::cout << "Scaling complete.\n";
-    std::cout << "Sample scaled row: "
-              << scaledX(0, 0) << ", "
-              << scaledX(0, 1) << "\n\n";
+    std::cout << "Dataset created.\n";
+    std::cout << "Rows: " << X.rowCount() << ", Cols: " << X.colCount() << "\n\n";
 
     // --- INITIAL MODEL ---
-    LinearModel model(Vector({0.1, 0.1}), 0.0);
+    LinearModel initialModel(Vector({0.1, 0.1}), 0.0);
 
-    std::cout << "Initial Weights: "
-              << model.getWeights()[0] << ", "
-              << model.getWeights()[1] << "\n";
+    std::cout << "Initial Model:\n";
+    std::cout << "Weights: "
+              << initialModel.getWeights()[0] << ", "
+              << initialModel.getWeights()[1] << "\n";
+    std::cout << "Bias: " << initialModel.getBias() << "\n\n";
 
-    std::cout << "Initial Bias: " << model.getBias() << "\n";
+    // --- PIPELINE ---
+    LinearRegressionPipeline pipeline(initialModel);
 
-    double initialLoss = meanSquaredError(model.predict(scaledX), targets);
-    std::cout << "Initial Loss: " << initialLoss << "\n\n";
-
-    // --- TRAIN ---
     Trainer trainer(0.1, 1000);
-    TrainingResults result = trainer.train(model, scaledX, targets);
-    const LinearModel& trained = result.model;
 
-    // --- RESULTS ---
-    std::cout << "=== TRAINING COMPLETE ===\n\n";
+    std::cout << "Training pipeline...\n\n";
 
-    std::cout << "Trained Weights: "
-              << trained.getWeights()[0] << ", "
-              << trained.getWeights()[1] << "\n";
+    TrainingResults result = pipeline.train(X, y, trainer);
 
-    std::cout << "Trained Bias: " << trained.getBias() << "\n";
+    // --- TRAINING RESULTS ---
+    std::cout << "=== TRAINING RESULTS ===\n";
+    std::cout << "Initial Loss: " << result.losses.front() << "\n";
+    std::cout << "Final Loss:   " << result.losses.back() << "\n\n";
 
-    double finalLoss = meanSquaredError(trained.predict(scaledX), targets);
-    std::cout << "Final Loss: " << finalLoss << "\n\n";
-
-    std::cout << "Loss progression:\n";
-    std::cout << "Start: " << result.losses.front() << "\n";
-    std::cout << "End:   " << result.losses.back() << "\n\n";
-
-    std::cout << "True Weights: "
-              << trueWeights[0] << ", "
-              << trueWeights[1] << "\n";
-
-    std::cout << "True Bias: " << trueBias << "\n";
-
-    std::cout << "\nVerifying predictions against true values:\n";
-
-    for (int i = 0; i < 5; ++i) {
-        Vector row({X(i, 0), X(i, 1)});
-        Vector scaledRow = scaler.transform(Matrix(1, 2, {X(i,0), X(i,1)})).getRow(0);
-
-        double pred = trained.predict(scaledRow);
-        double trueVal = X(i,0) * 3 + X(i,1) * 5 + 2;
-
-        std::cout << "Pred: " << pred << " | True: " << trueVal << "\n";
+    std::cout << "Sample Loss Progression:\n";
+    for (size_t i = 0; i < result.losses.size(); i += 200) {
+        std::cout << "Epoch " << i << ": " << result.losses[i] << "\n";
     }
+    std::cout << "\n";
+
+    // --- PREDICTIONS ON TRAINING DATA ---
+    Vector predictions = pipeline.predict(X);
+    double trainLoss = meanSquaredError(predictions, y);
+
+    std::cout << "Prediction Loss on Training Data: " << trainLoss << "\n\n";
+
+    // --- SAMPLE PREDICTIONS ---
+    std::cout << "Sample Predictions vs True Values:\n";
+    for (size_t i = 0; i < 5; ++i) {
+        std::cout << "Pred: " << predictions[i]
+                  << " | True: " << y[i] << "\n";
+    }
+    std::cout << "\n";
+
+    // --- TEST ON NEW DATA ---
+    Matrix newX(3, 2, {
+        0.25, 0.5,
+        0.75, 1.2,
+        1.5,  0.3
+    });
+
+    Vector newPreds = pipeline.predict(newX);
+
+    std::cout << "Predictions on New Data:\n";
+    for (size_t i = 0; i < newPreds.size(); ++i) {
+        double trueVal =
+            3.0 * newX(i, 0) +
+            5.0 * newX(i, 1) +
+            2.0;
+
+        std::cout << "Input: (" << newX(i, 0) << ", " << newX(i, 1) << ") "
+                  << "| Pred: " << newPreds[i]
+                  << " | True: " << trueVal << "\n";
+    }
+
+    std::cout << "\n=== TRUE MODEL ===\n";
+    std::cout << "Weights: 3, 5\n";
+    std::cout << "Bias: 2\n";
 
     return 0;
 }

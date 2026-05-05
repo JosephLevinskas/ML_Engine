@@ -9,12 +9,13 @@ namespace machineLearning {
 
 class StandardScaler {
 private:
-    Vector means; // Per feature
-    Vector stdDevs; // Per feature
+    std::optional<Vector> means; // Per feature
+    std::optional<Vector> stdDevs; // Per feature
     bool fitted = false;
 
 public:
     StandardScaler(Vector means_, Vector stdDevs_, bool fitted_);
+    StandardScaler() = default;
 
     void fit(const Matrix& X);
     Matrix transform(const Matrix& X) const;

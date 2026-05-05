@@ -54,24 +54,25 @@ void StandardScaler::fit(const Matrix& X) {
     fitted = true;
 }
 Matrix StandardScaler::transform(const Matrix& X) const {
-    if (!fitted) {
+    if (!fitted || !means.has_value() || !stdDevs.has_value()) {
         throw std::invalid_argument("Data not fitted yet, cannot scale");
     }
 
-    if (X.colCount() != means.size() || X.colCount() != stdDevs.size()) {
-        throw std::invalid_argument("Mean and stdDevs needs to be the same size as column count");
+    if (X.colCount() != means->size() || X.colCount() != stdDevs->size()) {
+        throw std::invalid_argument("Feature count does not match scaler state");
     }
 
     const size_t rowC = X.rowCount();
     const size_t colC = X.colCount();
 
-
     Matrix newMatrix = X;
+
     for (size_t i = 0; i < rowC; ++i) {
         for (size_t j = 0; j < colC; ++j) {
-            newMatrix(i, j) = (X(i, j) - means[j]) / stdDevs[j];
+            newMatrix(i, j) = (X(i, j) - (*means)[j]) / (*stdDevs)[j];
         }
     }
+
     return newMatrix;
 }
 
