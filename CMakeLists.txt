@@ -17,6 +17,7 @@ add_library(ml_core
     src/Trainer.cpp
     src/StandardScaler.cpp
     src/LinearRegressionPipeline.cpp
+    src/LogisticModel.cpp
 )
 
 target_include_directories(ml_core
@@ -142,3 +143,15 @@ target_link_libraries(linear_regression_pipeline_tests
 )
 
 add_test(NAME LinearRegressionPipeline COMMAND linear_regression_pipeline_tests)
+
+
+# LogisticModel
+add_executable(logistic_model_tests
+    tests/LogisticModelTests.cpp
+)
+
+target_link_libraries(logistic_model_tests
+    PRIVATE ml_core
+)
+
+add_test(NAME LogisticModel COMMAND logistic_model_tests)
