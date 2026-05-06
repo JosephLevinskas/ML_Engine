@@ -1,116 +1,121 @@
-#include "ml/Matrix.h"
 #include "ml/Vector.h"
+#include "ml/Matrix.h"
 #include "ml/LinearModel.h"
+#include "ml/LogisticModel.h"
 #include "ml/Trainer.h"
-#include "ml/LossFunctions.h"
-#include "ml/LinearRegressionPipeline.h"
 
 #include <iostream>
 #include <vector>
+#include <iomanip>
 
 using namespace machineLearning;
 
+void printDivider() {
+    std::cout << "----------------------------------------\n";
+}
+
 int main() {
-    std::cout << "=== LINEAR REGRESSION PIPELINE DEMO ===\n\n";
+    std::cout << std::fixed << std::setprecision(4);
 
-    // --- TRUE MODEL ---
-    Vector trueWeights({3.0, 5.0});
-    double trueBias = 2.0;
+    printDivider();
+    std::cout << "LINEAR REGRESSION DEMO\n";
+    printDivider();
 
-    // --- DATASET ---
-    const size_t rows = 1000;
-    const size_t cols = 2;
+    // y = 3x1 + 5x2 + 2
+    Matrix linearX(
+        5,
+        2,
+        {
+            1.0, 2.0,
+            2.0, 1.0,
+            3.0, 4.0,
+            4.0, 3.0,
+            5.0, 6.0
+        }
+    );
 
-    std::vector<double> data;
-    std::vector<double> targetData;
+    Vector linearY({15.0, 13.0, 31.0, 29.0, 43.0});
 
-    data.reserve(rows * cols);
-    targetData.reserve(rows);
+    LinearModel linearModel(Vector({0.0, 0.0}), 0.0);
 
-    for (size_t i = 0; i < rows; ++i) {
-        double x1 = static_cast<double>(i) / 1000.0;
-        double x2 = static_cast<double>(i % 10) / 10.0;
+    Trainer trainer(0.01, 1000);
 
-        data.push_back(x1);
-        data.push_back(x2);
+    TrainingResults linearResults = trainer.train(linearModel, linearX, linearY);
 
-        double y = 3.0 * x1 + 5.0 * x2 + 2.0;
-        targetData.push_back(y);
+    std::cout << "Final Linear Loss: " << linearResults.losses.back() << "\n";
+
+    Vector linearPred = linearResults.model.predict(linearX);
+
+    std::cout << "Predictions vs Targets:\n";
+    for (size_t i = 0; i < linearPred.size(); ++i) {
+        std::cout << "Pred: " << linearPred[i]
+                  << " | Target: " << linearY[i] << "\n";
     }
 
-    Matrix X(rows, cols, std::move(data));
-    Vector y(std::move(targetData));
+    printDivider();
 
-    std::cout << "Dataset created.\n";
-    std::cout << "Rows: " << X.rowCount() << ", Cols: " << X.colCount() << "\n\n";
+    std::cout << "LOGISTIC REGRESSION DEMO\n";
+    printDivider();
 
-    // --- INITIAL MODEL ---
-    LinearModel initialModel(Vector({0.1, 0.1}), 0.0);
+    // Simple separable dataset
+    Matrix logisticX(
+        6,
+        1,
+        {
+            0.0,
+            1.0,
+            2.0,
+            8.0,
+            9.0,
+            10.0
+        }
+    );
 
-    std::cout << "Initial Model:\n";
-    std::cout << "Weights: "
-              << initialModel.getWeights()[0] << ", "
-              << initialModel.getWeights()[1] << "\n";
-    std::cout << "Bias: " << initialModel.getBias() << "\n\n";
+    Vector logisticY({0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
 
-    // --- PIPELINE ---
-    LinearRegressionPipeline pipeline(initialModel);
+    LogisticModel logisticModel(Vector({0.0}), 0.0);
 
-    Trainer trainer(0.1, 1000);
+    Trainer logisticTrainer(0.1, 2000);
 
-    std::cout << "Training pipeline...\n\n";
+    LogisticTrainingResults logisticResults =
+        logisticTrainer.train(logisticModel, logisticX, logisticY);
 
-    TrainingResults result = pipeline.train(X, y, trainer);
+    std::cout << "Final Logistic Loss: " << logisticResults.losses.back() << "\n";
 
-    // --- TRAINING RESULTS ---
-    std::cout << "=== TRAINING RESULTS ===\n";
-    std::cout << "Initial Loss: " << result.losses.front() << "\n";
-    std::cout << "Final Loss:   " << result.losses.back() << "\n\n";
+    std::cout << "\nPredictions:\n";
 
-    std::cout << "Sample Loss Progression:\n";
-    for (size_t i = 0; i < result.losses.size(); i += 200) {
-        std::cout << "Epoch " << i << ": " << result.losses[i] << "\n";
-    }
-    std::cout << "\n";
+    for (size_t i = 0; i < logisticX.rowCount(); ++i) {
+        Vector x({logisticX(i, 0)});
 
-    // --- PREDICTIONS ON TRAINING DATA ---
-    Vector predictions = pipeline.predict(X);
-    double trainLoss = meanSquaredError(predictions, y);
+        double prob = logisticResults.model.predictProbability(x);
+        int cls = logisticResults.model.predictClass(x);
 
-    std::cout << "Prediction Loss on Training Data: " << trainLoss << "\n\n";
-
-    // --- SAMPLE PREDICTIONS ---
-    std::cout << "Sample Predictions vs True Values:\n";
-    for (size_t i = 0; i < 5; ++i) {
-        std::cout << "Pred: " << predictions[i]
-                  << " | True: " << y[i] << "\n";
-    }
-    std::cout << "\n";
-
-    // --- TEST ON NEW DATA ---
-    Matrix newX(3, 2, {
-        0.25, 0.5,
-        0.75, 1.2,
-        1.5,  0.3
-    });
-
-    Vector newPreds = pipeline.predict(newX);
-
-    std::cout << "Predictions on New Data:\n";
-    for (size_t i = 0; i < newPreds.size(); ++i) {
-        double trueVal =
-            3.0 * newX(i, 0) +
-            5.0 * newX(i, 1) +
-            2.0;
-
-        std::cout << "Input: (" << newX(i, 0) << ", " << newX(i, 1) << ") "
-                  << "| Pred: " << newPreds[i]
-                  << " | True: " << trueVal << "\n";
+        std::cout << "x = " << x[0]
+                  << " | prob = " << prob
+                  << " | class = " << cls
+                  << " | target = " << logisticY[i]
+                  << "\n";
     }
 
-    std::cout << "\n=== TRUE MODEL ===\n";
-    std::cout << "Weights: 3, 5\n";
-    std::cout << "Bias: 2\n";
+    printDivider();
+
+    std::cout << "GENERALIZATION TEST\n";
+    printDivider();
+
+    Vector test1({1.5});
+    Vector test2({9.5});
+
+    std::cout << "x = 1.5 -> prob: "
+              << logisticResults.model.predictProbability(test1)
+              << "\n";
+
+    std::cout << "x = 9.5 -> prob: "
+              << logisticResults.model.predictProbability(test2)
+              << "\n";
+
+    printDivider();
+
+    std::cout << "DONE\n";
 
     return 0;
 }

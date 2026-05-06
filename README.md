@@ -32,7 +32,7 @@ Build a complete ML system from scratch in C++:
 7. ✅ Gradient descent training loop (`Trainer`)
 8. ✅ Feature scaling (`StandardScaler`)
 9. ✅ Linear regression pipeline (`LinearRegressionPipeline`)
-10. ⬜ Logistic regression
+10. ✅ Logistic regression (`LogisticModel`)
 11. ⬜ Neural network layers and backpropagation
 12. ⬜ Training loop, evaluation, and application
 
@@ -46,6 +46,7 @@ ml_engine/
 │   ├── Gradients.h
 │   ├── LinearModel.h
 │   ├── LinearRegressionPipeline.h
+│   ├── LogisticModel.h
 │   ├── LossFunctions.h
 │   ├── Matrix.h
 │   ├── Operations.h
@@ -56,6 +57,7 @@ ml_engine/
 │   ├── Gradients.cpp
 │   ├── LinearModel.cpp
 │   ├── LinearRegressionPipeline.cpp
+│   ├── LogisticModel.cpp
 │   ├── LossFunctions.cpp
 │   ├── Matrix.cpp
 │   ├── Operations.cpp
@@ -66,6 +68,8 @@ ml_engine/
 │   ├── GradientsTests.cpp
 │   ├── LinearModelTests.cpp
 │   ├── LinearRegressionPipelineTests.cpp
+│   ├── LogisticModelTests.cpp
+│   ├── LogisticRegressionTrainerTests.cpp
 │   ├── LossFunctionsTests.cpp
 │   ├── MatrixTests.cpp
 │   ├── OperationsTests.cpp
@@ -112,16 +116,17 @@ ml_engine/
 
 ### LossFunctions
 
-- `meanSquaredError(predictions, targets)` computes the standard MSE.
+- `meanSquaredError(predictions, targets)` computes the standard MSE for regression.
+- `binaryCrossEntropy(probabilities, targets)` computes BCE loss for binary classification.
 - Validates matching vector lengths.
-- Provides scalar loss for regression evaluation.
+- Provides scalar loss for evaluation.
 
 ### Gradients
 
 - `computeLinearModelMSEGradients(X, predictions, targets)` computes gradients for linear regression.
-- Returns both weight gradients and bias gradient.
+- `computeLogisticModelBCEGradients(X, probabilities, targets)` computes gradients for logistic regression.
+- Returns both weight gradients and bias gradient for each model type.
 - Uses explicit matrix/vector math with no external helpers.
-- This is the next step before adding gradient descent.
 
 ### Trainer
 
@@ -144,6 +149,14 @@ ml_engine/
 - Provides end-to-end training and prediction capabilities.
 - Demonstrates a production-ready ML pipeline.
 
+### LogisticModel
+
+- `LogisticModel` stores `weights` and `bias` for binary classification.
+- Supports single-sample prediction `predict(Vector)` returning probability.
+- Supports batch prediction `predict(Matrix)` returning probability vector.
+- Uses sigmoid activation for binary classification.
+- Validates feature dimension alignment.
+
 ## Testing
 
 Every component has a dedicated executable and test file:
@@ -157,6 +170,8 @@ Every component has a dedicated executable and test file:
 - `trainer_tests`
 - `standard_scaler_tests`
 - `linear_regression_pipeline_tests`
+- `logistic_model_tests`
+- `logistic_regression_trainer_tests`
 
 Tests verify correct results, dimension mismatches, and edge-case behavior.
 
@@ -187,7 +202,7 @@ Run the demo with:
 
 ## Next Immediate Step
 
-The current codebase has a complete linear regression pipeline with training, scaling, and prediction. The next concrete steps are to implement logistic regression for binary classification, including sigmoid activation, binary cross-entropy loss, and corresponding gradients.
+The current codebase has complete linear and logistic regression implementations with training and inference. The next concrete steps are to implement neural network layers, including activation functions, forward/backward propagation, and multi-layer perceptrons.
 
 ## License
 
