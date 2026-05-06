@@ -77,7 +77,7 @@ Vector LogisticModel::predictClass(const Matrix& X) const {
             results.push_back(0.0);
         }
     }
-    return Vector(results);
+    return Vector(std::move(results));
 }
 
 }

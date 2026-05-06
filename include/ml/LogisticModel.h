@@ -13,7 +13,7 @@ private:
     static double sigmoid(double z);
 
 public:
-    LogisticModel(Vector weights_, double bias);
+    LogisticModel(Vector weights_, double bias_);
 
     double predictProbability(const Vector& X) const;
     Vector predictProbability(const Matrix& X) const;
