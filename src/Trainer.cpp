@@ -35,4 +35,23 @@ TrainingResults Trainer::train(const LinearModel& model, const Matrix& X, const 
     return {std::move(current), std::move(losses)};
 }
 
+LogisticTrainingResults Trainer::train(const LogisticModel& model, const Matrix& X, const Vector& targets) const {
+    LogisticModel current = model;
+    std::vector<double> losses;
+    losses.reserve(epochs);
+
+    for (size_t i = 0; i < epochs; ++i) {
+        Vector probabilities = current.predictProbability(X);
+        double loss = binaryCrossEntropy(probabilities, targets);
+        losses.push_back(loss);
+        LogisticModelGradients gradients = computeLogisticModelBCEGradients(X, probabilities, targets);
+        Vector updatedWeights = (current.getWeights() - (learningRate * gradients.weightGradients));
+        double updatedBias = (current.getBias() - (learningRate * gradients.biasGradient));
+        current = LogisticModel(std::move(updatedWeights), updatedBias);
+
+    }
+    return {std::move(current), std::move(losses)};
+
+}
+
 }

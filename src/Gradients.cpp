@@ -37,4 +37,38 @@ LinearModelGradients computeLinearModelMSEGradients(const Matrix& X,
         
         return LinearModelGradients{Vector(std::move(weightGradientResults)), biasGradientResult};
     }
+
+LogisticModelGradients computeLogisticModelBCEGradients(
+    const Matrix& X,
+    const Vector& probabilities,
+    const Vector& targets
+) {
+    const size_t rowC = X.rowCount();
+    const size_t colC = X.colCount();
+
+    if (rowC != probabilities.size() || rowC != targets.size()) {
+        throw std::invalid_argument("Invalid size for logistic model gradients input");
+    }
+
+    std::vector<double> weightResults(colC, 0.0);
+    double biasGrad = 0.0;
+
+    for (size_t i = 0; i < rowC; ++i) {
+        const double error = probabilities[i] - targets[i];
+
+        for (size_t j = 0; j < colC; ++j) {
+            weightResults[j] += error * X(i, j);
+        }
+
+        biasGrad += error;
+    }
+
+    for (double& grad : weightResults) {
+        grad /= rowC;
+    }
+
+    biasGrad /= rowC;
+
+    return LogisticModelGradients{Vector(std::move(weightResults)), biasGrad};
+}  
 }

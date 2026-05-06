@@ -155,3 +155,15 @@ target_link_libraries(logistic_model_tests
 )
 
 add_test(NAME LogisticModel COMMAND logistic_model_tests)
+
+
+# LogisticRegressionTests
+add_executable(logistic_regression_trainer_tests
+    tests/LogisticRegressionTrainerTests.cpp
+)
+
+target_link_libraries(logistic_regression_trainer_tests
+    PRIVATE ml_core
+)
+
+add_test(NAME LogisticRegressionTrainer COMMAND logistic_regression_trainer_tests)
