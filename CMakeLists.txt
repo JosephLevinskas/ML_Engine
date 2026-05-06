@@ -19,6 +19,7 @@ add_library(ml_core
     src/LinearRegressionPipeline.cpp
     src/LogisticModel.cpp
     src/DatasetLoader.cpp
+    src/DataSplitter.cpp
 )
 
 target_include_directories(ml_core

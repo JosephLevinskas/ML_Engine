@@ -1,126 +1,79 @@
 #include "ml/DataSetLoader.h"
+#include "ml/DataSplitter.h"
 #include "ml/LogisticModel.h"
 #include "ml/Trainer.h"
 #include "ml/StandardScaler.h"
 
-#include <algorithm>
-#include <exception>
-#include <iomanip>
 #include <iostream>
 #include <vector>
 
 using namespace machineLearning;
 
-Vector rowToVector(const Matrix& matrix, size_t row) {
+Vector rowToVector(const Matrix& m, size_t row) {
     std::vector<double> data;
-    data.reserve(matrix.colCount());
+    data.reserve(m.colCount());
 
-    for (size_t j = 0; j < matrix.colCount(); ++j) {
-        data.push_back(matrix(row, j));
+    for (size_t j = 0; j < m.colCount(); ++j) {
+        data.push_back(m(row, j));
     }
 
     return Vector(std::move(data));
 }
 
 int main() {
-    std::cout << std::fixed << std::setprecision(4);
-
     try {
-        const std::string path = "assets/User_Data.csv";
-        const size_t targetColumn = 2;
+        // ---- Load dataset ----
+        Dataset dataset =
+            DataSetLoader::loadCSV("assets/User_Data.csv", 2);
 
-        std::cout << "Loading dataset: " << path << "\n";
+        // ---- Split dataset ----
+        DatasetSplit split =
+            DataSplitter::split(dataset, 0.8);
 
-        Dataset dataset = DataSetLoader::loadCSV(path, targetColumn);
-
-        std::cout << "Dataset loaded.\n";
-        std::cout << "Samples:  " << dataset.features.rowCount() << "\n";
-        std::cout << "Features: " << dataset.features.colCount() << "\n\n";
-
+        // ---- Scale (IMPORTANT: fit only on train) ----
         StandardScaler scaler;
-        Matrix scaledX = scaler.fitTransform(dataset.features);
 
-        Vector initialWeights(std::vector<double>(scaledX.colCount(), 0.0));
-        LogisticModel initialModel(initialWeights, 0.0);
+        Matrix trainX = scaler.fitTransform(split.train.features);
+        Matrix testX  = scaler.transform(split.test.features);
 
+        // ---- Model ----
+        Vector initialWeights(
+            std::vector<double>(trainX.colCount(), 0.0)
+        );
+
+        LogisticModel model(initialWeights, 0.0);
+
+        // ---- Train ----
         Trainer trainer(0.1, 5000);
 
-        std::cout << "Training logistic regression with scaled features...\n";
-
         LogisticTrainingResults results =
-            trainer.train(initialModel, scaledX, dataset.targets);
+            trainer.train(model, trainX, split.train.targets);
 
-        std::cout << "Training complete.\n\n";
+        std::cout << "Train loss: "
+                  << results.losses.back() << "\n";
 
-        std::cout << "Initial loss: " << results.losses.front() << "\n";
-        std::cout << "Final loss:   " << results.losses.back() << "\n\n";
-
+        // ---- Evaluate on TEST set ----
         size_t correct = 0;
 
-        std::cout << "First 20 predictions:\n";
+        for (size_t i = 0; i < testX.rowCount(); ++i) {
+            Vector x = rowToVector(testX, i);
 
-        const size_t rowsToPrint =
-            std::min<size_t>(20, dataset.features.rowCount());
+            int pred = results.model.predictClass(x);
+            int target = static_cast<int>(split.test.targets[i]);
 
-        for (size_t i = 0; i < dataset.features.rowCount(); ++i) {
-            Vector x = rowToVector(scaledX, i);
-
-            double probability = results.model.predictProbability(x);
-            int prediction = results.model.predictClass(x);
-            int target = static_cast<int>(dataset.targets[i]);
-
-            if (prediction == target) {
+            if (pred == target) {
                 ++correct;
-            }
-
-            if (i < rowsToPrint) {
-                std::cout << "Sample " << i
-                          << " | age = " << dataset.features(i, 0)
-                          << " | salary = " << dataset.features(i, 1)
-                          << " | prob = " << probability
-                          << " | pred = " << prediction
-                          << " | target = " << target
-                          << "\n";
             }
         }
 
         double accuracy =
-            static_cast<double>(correct) / dataset.features.rowCount();
+            static_cast<double>(correct) / testX.rowCount();
 
-        std::cout << "\nAccuracy: " << accuracy * 100.0 << "%\n\n";
-
-        std::cout << "Manual predictions:\n";
-
-        Matrix manualRaw(
-            4,
-            2,
-            {
-                25.0, 30000.0,
-                30.0, 140000.0,
-                50.0, 60000.0,
-                55.0, 120000.0
-            }
-        );
-
-        Matrix manualScaled = scaler.transform(manualRaw);
-
-        for (size_t i = 0; i < manualScaled.rowCount(); ++i) {
-            Vector x = rowToVector(manualScaled, i);
-
-            std::cout << "Age " << manualRaw(i, 0)
-                      << ", Salary " << manualRaw(i, 1)
-                      << " -> prob = "
-                      << results.model.predictProbability(x)
-                      << " | class = "
-                      << results.model.predictClass(x)
-                      << "\n";
-        }
-
-        std::cout << "\nDone.\n";
+        std::cout << "Test Accuracy: "
+                  << accuracy * 100.0 << "%\n";
     }
     catch (const std::exception& e) {
-        std::cerr << "ERROR: " << e.what() << "\n";
-        return 1;
+        std::cout << "ERROR: " << e.what() << "\n";
     }
 
     return 0;
