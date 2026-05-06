@@ -1,121 +1,127 @@
-#include "ml/Vector.h"
-#include "ml/Matrix.h"
-#include "ml/LinearModel.h"
+#include "ml/DataSetLoader.h"
 #include "ml/LogisticModel.h"
 #include "ml/Trainer.h"
+#include "ml/StandardScaler.h"
 
+#include <algorithm>
+#include <exception>
+#include <iomanip>
 #include <iostream>
 #include <vector>
-#include <iomanip>
 
 using namespace machineLearning;
 
-void printDivider() {
-    std::cout << "----------------------------------------\n";
+Vector rowToVector(const Matrix& matrix, size_t row) {
+    std::vector<double> data;
+    data.reserve(matrix.colCount());
+
+    for (size_t j = 0; j < matrix.colCount(); ++j) {
+        data.push_back(matrix(row, j));
+    }
+
+    return Vector(std::move(data));
 }
 
 int main() {
     std::cout << std::fixed << std::setprecision(4);
 
-    printDivider();
-    std::cout << "LINEAR REGRESSION DEMO\n";
-    printDivider();
+    try {
+        const std::string path = "assets/User_Data.csv";
+        const size_t targetColumn = 2;
 
-    // y = 3x1 + 5x2 + 2
-    Matrix linearX(
-        5,
-        2,
-        {
-            1.0, 2.0,
-            2.0, 1.0,
-            3.0, 4.0,
-            4.0, 3.0,
-            5.0, 6.0
+        std::cout << "Loading dataset: " << path << "\n";
+
+        Dataset dataset = DataSetLoader::loadCSV(path, targetColumn);
+
+        std::cout << "Dataset loaded.\n";
+        std::cout << "Samples:  " << dataset.features.rowCount() << "\n";
+        std::cout << "Features: " << dataset.features.colCount() << "\n\n";
+
+        StandardScaler scaler;
+        Matrix scaledX = scaler.fitTransform(dataset.features);
+
+        Vector initialWeights(std::vector<double>(scaledX.colCount(), 0.0));
+        LogisticModel initialModel(initialWeights, 0.0);
+
+        Trainer trainer(0.1, 5000);
+
+        std::cout << "Training logistic regression with scaled features...\n";
+
+        LogisticTrainingResults results =
+            trainer.train(initialModel, scaledX, dataset.targets);
+
+        std::cout << "Training complete.\n\n";
+
+        std::cout << "Initial loss: " << results.losses.front() << "\n";
+        std::cout << "Final loss:   " << results.losses.back() << "\n\n";
+
+        size_t correct = 0;
+
+        std::cout << "First 20 predictions:\n";
+
+        const size_t rowsToPrint =
+            std::min<size_t>(20, dataset.features.rowCount());
+
+        for (size_t i = 0; i < dataset.features.rowCount(); ++i) {
+            Vector x = rowToVector(scaledX, i);
+
+            double probability = results.model.predictProbability(x);
+            int prediction = results.model.predictClass(x);
+            int target = static_cast<int>(dataset.targets[i]);
+
+            if (prediction == target) {
+                ++correct;
+            }
+
+            if (i < rowsToPrint) {
+                std::cout << "Sample " << i
+                          << " | age = " << dataset.features(i, 0)
+                          << " | salary = " << dataset.features(i, 1)
+                          << " | prob = " << probability
+                          << " | pred = " << prediction
+                          << " | target = " << target
+                          << "\n";
+            }
         }
-    );
 
-    Vector linearY({15.0, 13.0, 31.0, 29.0, 43.0});
+        double accuracy =
+            static_cast<double>(correct) / dataset.features.rowCount();
 
-    LinearModel linearModel(Vector({0.0, 0.0}), 0.0);
+        std::cout << "\nAccuracy: " << accuracy * 100.0 << "%\n\n";
 
-    Trainer trainer(0.01, 1000);
+        std::cout << "Manual predictions:\n";
 
-    TrainingResults linearResults = trainer.train(linearModel, linearX, linearY);
+        Matrix manualRaw(
+            4,
+            2,
+            {
+                25.0, 30000.0,
+                30.0, 140000.0,
+                50.0, 60000.0,
+                55.0, 120000.0
+            }
+        );
 
-    std::cout << "Final Linear Loss: " << linearResults.losses.back() << "\n";
+        Matrix manualScaled = scaler.transform(manualRaw);
 
-    Vector linearPred = linearResults.model.predict(linearX);
+        for (size_t i = 0; i < manualScaled.rowCount(); ++i) {
+            Vector x = rowToVector(manualScaled, i);
 
-    std::cout << "Predictions vs Targets:\n";
-    for (size_t i = 0; i < linearPred.size(); ++i) {
-        std::cout << "Pred: " << linearPred[i]
-                  << " | Target: " << linearY[i] << "\n";
-    }
-
-    printDivider();
-
-    std::cout << "LOGISTIC REGRESSION DEMO\n";
-    printDivider();
-
-    // Simple separable dataset
-    Matrix logisticX(
-        6,
-        1,
-        {
-            0.0,
-            1.0,
-            2.0,
-            8.0,
-            9.0,
-            10.0
+            std::cout << "Age " << manualRaw(i, 0)
+                      << ", Salary " << manualRaw(i, 1)
+                      << " -> prob = "
+                      << results.model.predictProbability(x)
+                      << " | class = "
+                      << results.model.predictClass(x)
+                      << "\n";
         }
-    );
 
-    Vector logisticY({0.0, 0.0, 0.0, 1.0, 1.0, 1.0});
-
-    LogisticModel logisticModel(Vector({0.0}), 0.0);
-
-    Trainer logisticTrainer(0.1, 2000);
-
-    LogisticTrainingResults logisticResults =
-        logisticTrainer.train(logisticModel, logisticX, logisticY);
-
-    std::cout << "Final Logistic Loss: " << logisticResults.losses.back() << "\n";
-
-    std::cout << "\nPredictions:\n";
-
-    for (size_t i = 0; i < logisticX.rowCount(); ++i) {
-        Vector x({logisticX(i, 0)});
-
-        double prob = logisticResults.model.predictProbability(x);
-        int cls = logisticResults.model.predictClass(x);
-
-        std::cout << "x = " << x[0]
-                  << " | prob = " << prob
-                  << " | class = " << cls
-                  << " | target = " << logisticY[i]
-                  << "\n";
+        std::cout << "\nDone.\n";
     }
-
-    printDivider();
-
-    std::cout << "GENERALIZATION TEST\n";
-    printDivider();
-
-    Vector test1({1.5});
-    Vector test2({9.5});
-
-    std::cout << "x = 1.5 -> prob: "
-              << logisticResults.model.predictProbability(test1)
-              << "\n";
-
-    std::cout << "x = 9.5 -> prob: "
-              << logisticResults.model.predictProbability(test2)
-              << "\n";
-
-    printDivider();
-
-    std::cout << "DONE\n";
+    catch (const std::exception& e) {
+        std::cerr << "ERROR: " << e.what() << "\n";
+        return 1;
+    }
 
     return 0;
 }

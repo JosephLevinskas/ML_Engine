@@ -18,6 +18,7 @@ add_library(ml_core
     src/StandardScaler.cpp
     src/LinearRegressionPipeline.cpp
     src/LogisticModel.cpp
+    src/DatasetLoader.cpp
 )
 
 target_include_directories(ml_core
