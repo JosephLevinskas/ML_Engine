@@ -32,9 +32,13 @@ Build a complete ML system from scratch in C++:
 7. ✅ Gradient descent training loop (`Trainer`)
 8. ✅ Feature scaling (`StandardScaler`)
 9. ✅ Linear regression pipeline (`LinearRegressionPipeline`)
-10. ✅ Logistic regression (`LogisticModel`)
-11. ⬜ Neural network layers and backpropagation
-12. ⬜ Training loop, evaluation, and application
+10. ✅ Logistic regression model (`LogisticModel`) with sigmoid activation
+11. ✅ Binary cross-entropy loss and logistic gradients
+12. ✅ Logistic regression training with end-to-end pipeline
+13. ✅ Dataset loading from CSV (`DataSetLoader`)
+14. ⬜ Neural network layers (dense layers, activation functions)
+15. ⬜ Backpropagation for multi-layer networks
+16. ⬜ Advanced training techniques (momentum, regularization)
 
 ## Current Architecture
 
@@ -43,6 +47,7 @@ ml_engine/
 ├── apps/
 │   └── main.cpp
 ├── include/ml/
+│   ├── DataSetLoader.h
 │   ├── Gradients.h
 │   ├── LinearModel.h
 │   ├── LinearRegressionPipeline.h
@@ -157,6 +162,13 @@ ml_engine/
 - Uses sigmoid activation for binary classification.
 - Validates feature dimension alignment.
 
+### DataSetLoader
+
+- `DataSetLoader::loadCSV()` reads CSV files into feature matrices and target vectors.
+- Automatically handles feature/target column separation.
+- Provides a `Dataset` struct containing features (Matrix) and targets (Vector).
+- Essential for loading real-world data for model training and evaluation.
+
 ## Testing
 
 Every component has a dedicated executable and test file:
@@ -186,12 +198,13 @@ ctest -C Release
 
 ### Demo Application
 
-The `apps/main.cpp` demonstrates a complete linear regression pipeline:
+The `apps/main.cpp` demonstrates a complete logistic regression classification pipeline:
 
-- Generates synthetic training data
-- Trains a linear model using gradient descent
-- Evaluates performance on training data
-- Makes predictions on new data
+- Loads real CSV dataset from `assets/User_Data.csv`
+- Applies feature scaling (standardization) to input features
+- Trains a logistic regression model using gradient descent (5000 epochs)
+- Evaluates model accuracy on the training dataset
+- Makes predictions on new unseen samples with probability scores
 - Shows loss progression during training
 
 Run the demo with:
@@ -199,6 +212,8 @@ Run the demo with:
 ```bash
 ./Release/main.exe
 ```
+
+The demo trains on user purchase behavior data (age and salary) to predict purchase decisions with 75-90% accuracy.
 
 ## Next Immediate Step
 
