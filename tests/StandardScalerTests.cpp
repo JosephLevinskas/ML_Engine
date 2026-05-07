@@ -1,4 +1,4 @@
-#include "ml/StandardScaler.h"
+#include "ml/training/StandardScaler.h"
 
 #include <cassert>
 #include <cmath>

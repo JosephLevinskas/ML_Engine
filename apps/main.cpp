@@ -1,8 +1,8 @@
-#include "ml/DataSetLoader.h"
-#include "ml/DataSplitter.h"
-#include "ml/LogisticModel.h"
-#include "ml/LogisticRegressionPipeline.h"
-#include "ml/Trainer.h"
+#include "ml/data/DataSetLoader.h"
+#include "ml/data/DataSplitter.h"
+#include "ml/models/LogisticModel.h"
+#include "ml/pipelines/LogisticRegressionPipeline.h"
+#include "ml/training/Trainer.h"
 
 #include <exception>
 #include <iostream>

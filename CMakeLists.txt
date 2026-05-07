@@ -8,19 +8,19 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 
 # Main compile
 add_library(ml_core
-    src/Vector.cpp
-    src/Matrix.cpp 
-    src/Operations.cpp
-    src/LinearModel.cpp
-    src/LossFunctions.cpp
-    src/Gradients.cpp
-    src/Trainer.cpp
-    src/StandardScaler.cpp
-    src/LinearRegressionPipeline.cpp
-    src/LogisticModel.cpp
-    src/DatasetLoader.cpp
-    src/DataSplitter.cpp
-    src/LogisticRegressionPipeline.cpp
+    src/core/Vector.cpp
+    src/core/Matrix.cpp
+    src/core/Operations.cpp
+    src/models/LinearModel.cpp
+    src/models/LogisticModel.cpp
+    src/data/DataSetLoader.cpp
+    src/data/DataSplitter.cpp
+    src/pipelines/LinearRegressionPipeline.cpp
+    src/pipelines/LogisticRegressionPipeline.cpp
+    src/training/LossFunctions.cpp
+    src/training/Gradients.cpp
+    src/training/StandardScaler.cpp
+    src/training/Trainer.cpp
 )
 
 target_include_directories(ml_core

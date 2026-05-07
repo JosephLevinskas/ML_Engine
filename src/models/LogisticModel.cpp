@@ -1,5 +1,5 @@
-#include "ml/LogisticModel.h"
-#include "ml/Operations.h"
+#include "ml/models/LogisticModel.h"
+#include "ml/core/Operations.h"
 
 #include <vector>
 #include <cmath>

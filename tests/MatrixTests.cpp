@@ -1,4 +1,4 @@
-#include "ml/Matrix.h"
+#include "ml/core/Matrix.h"
 
 #include <cassert>
 #include <cmath>

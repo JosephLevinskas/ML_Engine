@@ -1,6 +1,6 @@
 #pragma once
 
-#include "ml/DataSetLoader.h"
+#include "ml/data/DataSetLoader.h"
 
 namespace machineLearning {
 

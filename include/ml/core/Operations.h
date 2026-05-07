@@ -1,7 +1,7 @@
 #pragma once 
 
-#include "ml/Vector.h"
-#include "ml/Matrix.h"
+#include "ml/core/Vector.h"
+#include "ml/core/Matrix.h"
 
 namespace machineLearning {
 
@@ -11,3 +11,4 @@ Vector operator*(const Matrix&, const Vector&);
 
 
 }
+

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "ml/DataSetLoader.h"
-#include "ml/LogisticModel.h"
-#include "ml/StandardScaler.h"
-#include "ml/Trainer.h"
-#include "ml/Vector.h"
-#include "ml/Matrix.h"
+#include "ml/data/DataSetLoader.h"
+#include "ml/models/LogisticModel.h"
+#include "ml/training/StandardScaler.h"
+#include "ml/training/Trainer.h"
+#include "ml/core/Vector.h"
+#include "ml/core/Matrix.h"
 
 namespace machineLearning {
 

@@ -1,6 +1,6 @@
-#include "ml/LossFunctions.h"
-#include "ml/Vector.h"
-#include "ml/Operations.h"
+#include "ml/training/LossFunctions.h"
+#include "ml/core/Vector.h"
+#include "ml/core/Operations.h"
 
 #include <utility>
 #include <stdexcept>

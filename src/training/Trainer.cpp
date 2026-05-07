@@ -1,6 +1,6 @@
-#include "ml/Trainer.h"
-#include "ml/Gradients.h"
-#include "ml/LossFunctions.h"
+#include "ml/training/Trainer.h"
+#include "ml/training/Gradients.h"
+#include "ml/training/LossFunctions.h"
 
 #include <utility>
 #include <stdexcept>

@@ -1,6 +1,6 @@
-#include "ml/Trainer.h"
-#include "ml/LinearModel.h"
-#include "ml/LossFunctions.h"
+#include "ml/training/Trainer.h"
+#include "ml/models/LinearModel.h"
+#include "ml/training/LossFunctions.h"
 
 #include <cassert>
 #include <stdexcept>

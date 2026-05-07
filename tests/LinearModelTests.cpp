@@ -1,4 +1,4 @@
-#include "ml/LinearModel.h"
+#include "ml/models/LinearModel.h"
 
 #include <cassert>
 #include <stdexcept>

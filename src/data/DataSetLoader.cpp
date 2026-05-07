@@ -1,6 +1,6 @@
-#include "ml/DataSetLoader.h"
-#include "ml/Matrix.h"
-#include "ml/Vector.h"
+#include "ml/data/DataSetLoader.h"
+#include "ml/core/Matrix.h"
+#include "ml/core/Vector.h"
 
 #include <sstream>
 #include <fstream>

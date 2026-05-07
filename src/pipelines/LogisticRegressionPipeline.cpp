@@ -1,4 +1,4 @@
-#include "ml/LogisticRegressionPipeline.h"
+#include "ml/pipelines/LogisticRegressionPipeline.h"
 
 #include <stdexcept>
 #include <utility>

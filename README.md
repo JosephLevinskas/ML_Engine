@@ -47,28 +47,43 @@ ml_engine/
 ├── apps/
 │   └── main.cpp
 ├── include/ml/
-│   ├── DataSetLoader.h
-│   ├── Gradients.h
-│   ├── LinearModel.h
-│   ├── LinearRegressionPipeline.h
-│   ├── LogisticModel.h
-│   ├── LossFunctions.h
-│   ├── Matrix.h
-│   ├── Operations.h
-│   ├── StandardScaler.h
-│   ├── Trainer.h
-│   └── Vector.h
+│   ├── core/
+│   │   ├── Matrix.h
+│   │   ├── Operations.h
+│   │   └── Vector.h
+│   ├── data/
+│   │   ├── DataSetLoader.h
+│   │   └── DataSplitter.h
+│   ├── models/
+│   │   ├── LinearModel.h
+│   │   └── LogisticModel.h
+│   ├── pipelines/
+│   │   ├── LinearRegressionPipeline.h
+│   │   └── LogisticRegressionPipeline.h
+│   └── training/
+│       ├── Gradients.h
+│       ├── LossFunctions.h
+│       ├── StandardScaler.h
+│       └── Trainer.h
 ├── src/
-│   ├── Gradients.cpp
-│   ├── LinearModel.cpp
-│   ├── LinearRegressionPipeline.cpp
-│   ├── LogisticModel.cpp
-│   ├── LossFunctions.cpp
-│   ├── Matrix.cpp
-│   ├── Operations.cpp
-│   ├── StandardScaler.cpp
-│   ├── Trainer.cpp
-│   └── Vector.cpp
+│   ├── core/
+│   │   ├── Matrix.cpp
+│   │   ├── Operations.cpp
+│   │   └── Vector.cpp
+│   ├── data/
+│   │   ├── DataSetLoader.cpp
+│   │   └── DataSplitter.cpp
+│   ├── models/
+│   │   ├── LinearModel.cpp
+│   │   └── LogisticModel.cpp
+│   ├── pipelines/
+│   │   ├── LinearRegressionPipeline.cpp
+│   │   └── LogisticRegressionPipeline.cpp
+│   └── training/
+│       ├── Gradients.cpp
+│       ├── LossFunctions.cpp
+│       ├── StandardScaler.cpp
+│       └── Trainer.cpp
 ├── tests/
 │   ├── GradientsTests.cpp
 │   ├── LinearModelTests.cpp

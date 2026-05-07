@@ -1,8 +1,8 @@
-#include "ml/LinearRegressionPipeline.h"
-#include "ml/Matrix.h"
-#include "ml/Vector.h"
-#include "ml/Trainer.h"
-#include "ml/LossFunctions.h"
+#include "ml/pipelines/LinearRegressionPipeline.h"
+#include "ml/core/Matrix.h"
+#include "ml/core/Vector.h"
+#include "ml/training/Trainer.h"
+#include "ml/training/LossFunctions.h"
 
 #include <cassert>
 #include <cmath>

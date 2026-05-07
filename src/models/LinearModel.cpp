@@ -1,7 +1,7 @@
-#include "ml/LinearModel.h"
-#include "ml/Matrix.h"
-#include "ml/Vector.h"
-#include "ml/Operations.h"
+#include "ml/models/LinearModel.h"
+#include "ml/core/Matrix.h"
+#include "ml/core/Vector.h"
+#include "ml/core/Operations.h"
 
 #include <utility>
 #include <stdexcept>

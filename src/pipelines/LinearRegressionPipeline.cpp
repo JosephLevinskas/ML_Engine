@@ -1,4 +1,4 @@
-#include "ml/LinearRegressionPipeline.h"
+#include "ml/pipelines/LinearRegressionPipeline.h"
 
 #include <vector>
 #include <stdexcept>
