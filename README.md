@@ -21,6 +21,19 @@ Build a complete ML system from scratch in C++:
 - Thorough tests for every module
 - Clear, maintainable architecture suitable for real systems
 
+## What This Project Demonstrates
+
+This project implements a complete machine learning workflow from scratch:
+
+- Raw CSV data ingestion
+- Dataset representation and preprocessing
+- Train/test splitting for proper evaluation
+- Feature scaling for stable optimization
+- Model training using gradient descent
+- Prediction and accuracy evaluation on unseen data
+
+All components are implemented manually without external ML libraries.
+
 ## Progress Status
 
 1. ✅ Vector math system
@@ -36,9 +49,10 @@ Build a complete ML system from scratch in C++:
 11. ✅ Binary cross-entropy loss and logistic gradients
 12. ✅ Logistic regression training with end-to-end pipeline
 13. ✅ Dataset loading from CSV (`DataSetLoader`)
-14. ⬜ Neural network layers (dense layers, activation functions)
-15. ⬜ Backpropagation for multi-layer networks
-16. ⬜ Advanced training techniques (momentum, regularization)
+14. ✅ Train/test split (`DataSplitter`)
+15. ⬜ Neural network layers (dense layers, activation functions)
+16. ⬜ Backpropagation for multi-layer networks
+17. ⬜ Advanced training techniques (momentum, regularization)
 
 ## Current Architecture
 
@@ -169,6 +183,13 @@ ml_engine/
 - Provides end-to-end training and prediction capabilities.
 - Demonstrates a production-ready ML pipeline.
 
+### LogisticRegressionPipeline
+
+- Combines `StandardScaler`, `Trainer`, and `LogisticModel`.
+- Handles feature scaling internally for both training and inference.
+- Ensures consistent preprocessing between training and prediction.
+- Represents a clean, production-style ML pipeline abstraction.
+
 ### LogisticModel
 
 - `LogisticModel` stores `weights` and `bias` for binary classification.
@@ -216,9 +237,10 @@ ctest -C Release
 The `apps/main.cpp` demonstrates a complete logistic regression classification pipeline:
 
 - Loads real CSV dataset from `assets/User_Data.csv`
+- Splits dataset into training and testing sets (80/20)
 - Applies feature scaling (standardization) to input features
 - Trains a logistic regression model using gradient descent (5000 epochs)
-- Evaluates model accuracy on the training dataset
+- Evaluates model accuracy on unseen test data
 - Makes predictions on new unseen samples with probability scores
 - Shows loss progression during training
 
@@ -230,9 +252,12 @@ Run the demo with:
 
 The demo trains on user purchase behavior data (age and salary) to predict purchase decisions with 75-90% accuracy.
 
-## Next Immediate Step
+## Next Steps
 
-The current codebase has complete linear and logistic regression implementations with training and inference. The next concrete steps are to implement neural network layers, including activation functions, forward/backward propagation, and multi-layer perceptrons.
+- Add L2 regularization to improve generalization
+- Extend pipelines to support configurable preprocessing and training options
+- Implement neural network layers (dense layers, activations)
+- Add backpropagation for multi-layer models
 
 ## License
 
