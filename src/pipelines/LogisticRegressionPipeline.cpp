@@ -26,7 +26,7 @@ LogisticTrainingResults LogisticRegressionPipeline::train(
     model = std::move(results.model);
     trained = true;
 
-    return LogisticTrainingResults{model, std::move(results.losses)};
+    return LogisticTrainingResults{model, std::move(results.trainingObjectiveLosses), std::move(results.dataLosses)};
 }
 
 Vector LogisticRegressionPipeline::predictProbability(const Matrix& X) const {

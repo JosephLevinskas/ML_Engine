@@ -6,4 +6,5 @@ namespace machineLearning {
 
 double meanSquaredError(const Vector& predictions, const Vector& targets);
 double binaryCrossEntropy(const Vector& probabilities, const Vector& targets);
+double l2Penalty(const Vector& weights, double lambda);
 }

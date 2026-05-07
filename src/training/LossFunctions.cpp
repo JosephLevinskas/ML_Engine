@@ -48,4 +48,14 @@ double binaryCrossEntropy(const Vector& probabilities, const Vector& targets) {
     return loss / probabilities.size();
 }
 
+
+double l2Penalty(const Vector& weights, double lambda) {
+    double sum = 0.0;
+
+    for (size_t i = 0; i < weights.size(); ++i) {
+        sum += weights[i] * weights[i];
+    }
+
+    return 0.5 * lambda * sum;
+}
 }

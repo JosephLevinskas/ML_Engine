@@ -47,8 +47,8 @@ void testPipelineTrainsAndPredicts() {
 
     TrainingResults result = pipeline.train(X, y, trainer);
 
-    assert(result.losses.front() > result.losses.back());
-    assert(result.losses.back() < 1e-6);
+    assert(result.trainingObjectiveLosses.front() > result.trainingObjectiveLosses.back());
+    assert(result.trainingObjectiveLosses.back() < 1e-6);
 
     Vector predictions = pipeline.predict(X);
 

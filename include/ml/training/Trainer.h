@@ -8,21 +8,25 @@ namespace machineLearning {
 
 struct TrainingResults {
     LinearModel model;
-    std::vector<double> losses;
+    std::vector<double> trainingObjectiveLosses; 
+    std::vector<double> dataLosses; 
 };
 
 struct LogisticTrainingResults {
     LogisticModel model;
-    std::vector<double> losses;
+    std::vector<double> trainingObjectiveLosses; 
+    std::vector<double> dataLosses; 
 };
 
 class Trainer {
 private:
     double learningRate;
     size_t epochs;
+    double lambda = 0.0; 
 
 public:
     Trainer(double learningRate_, size_t epochs_);
+    Trainer (double learningRate_, size_t epochs_, double lambda_);
 
     TrainingResults train(
         const LinearModel& model,

@@ -178,8 +178,8 @@ void testLogisticTrainingLearnsSimpleDataset() {
 
     LogisticTrainingResults results = trainer.train(initialModel, X, y);
 
-    double firstLoss = results.losses.front();
-    double finalLoss = results.losses.back();
+    double firstLoss = results.trainingObjectiveLosses.front();
+    double finalLoss = results.trainingObjectiveLosses.back();
 
     assert(finalLoss < firstLoss);
 

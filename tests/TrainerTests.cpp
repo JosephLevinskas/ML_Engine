@@ -113,8 +113,8 @@ void test_training_records_loss_history() {
     Trainer trainer(0.01, 10);
     TrainingResults result = trainer.train(initial, X, targets);
 
-    assert(result.losses.size() == 10);
-    assert(result.losses.back() < result.losses.front());
+    assert(result.trainingObjectiveLosses.size() == 10);
+    assert(result.trainingObjectiveLosses.back() < result.trainingObjectiveLosses.front());
 }
 
 int main() {
