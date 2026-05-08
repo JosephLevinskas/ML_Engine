@@ -49,10 +49,23 @@ All components are implemented manually without external ML libraries.
 11. ✅ Binary cross-entropy loss and logistic gradients
 12. ✅ Logistic regression training with end-to-end pipeline
 13. ✅ Dataset loading from CSV (`DataSetLoader`)
-14. ✅ Train/test split (`DataSplitter`)
-15. ⬜ Neural network layers (dense layers, activation functions)
-16. ⬜ Backpropagation for multi-layer networks
-17. ⬜ Advanced training techniques (momentum, regularization)
+14. ✅ Train/validation/test split (`DataSplitter`)
+15. ✅ Neural network layers (dense layers, activation functions)
+16. ✅ Backpropagation for multi-layer networks
+17. ⬜ Class-balanced loss / imbalance-aware training
+18. ⬜ Advanced training techniques (momentum, regularization)
+
+## Recent Additions
+
+- `include/ml/activations/ReLUActivation.h`
+- `include/ml/activations/SigmoidActivation.h`
+- `include/ml/layers/DenseLayer.h`
+- `src/activations/ReLUActivation.cpp`
+- `src/activations/SigmoidActivation.cpp`
+- `src/layers/DenseLayer.cpp`
+- `src/data/DataSplitter.cpp`
+- `apps/main.cpp` now includes debug metrics and class-balance evaluation
+- Class-balanced binary cross-entropy is now part of the training demo
 
 ## Current Architecture
 
@@ -61,6 +74,9 @@ ml_engine/
 ├── apps/
 │   └── main.cpp
 ├── include/ml/
+│   ├── activations/
+│   │   ├── ReLUActivation.h
+│   │   └── SigmoidActivation.h
 │   ├── core/
 │   │   ├── Matrix.h
 │   │   ├── Operations.h
@@ -68,6 +84,8 @@ ml_engine/
 │   ├── data/
 │   │   ├── DataSetLoader.h
 │   │   └── DataSplitter.h
+│   ├── layers/
+│   │   └── DenseLayer.h
 │   ├── models/
 │   │   ├── LinearModel.h
 │   │   └── LogisticModel.h
@@ -234,15 +252,20 @@ ctest -C Release
 
 ### Demo Application
 
-The `apps/main.cpp` demonstrates a complete logistic regression classification pipeline:
+The `apps/main.cpp` demonstrates a complete classification workflow with a small neural network:
 
-- Loads real CSV dataset from `assets/User_Data.csv`
-- Splits dataset into training and testing sets (80/20)
-- Applies feature scaling (standardization) to input features
-- Trains a logistic regression model using gradient descent (5000 epochs)
-- Evaluates model accuracy on unseen test data
-- Makes predictions on new unseen samples with probability scores
-- Shows loss progression during training
+- Loads CSV data from `assets/User_Data.csv`
+- Splits data into training, validation, and test sets (60/20/20)
+- Applies feature scaling using `StandardScaler`
+- Builds a two-layer network with `DenseLayer`, `ReLUActivation`, and `SigmoidActivation`
+- Trains with binary cross-entropy and class-balanced weighting
+- Evaluates validation and test accuracy
+- Prints debugging metrics per epoch:
+  - validation accuracy
+  - predicted positive rate
+  - average probability
+  - min/max probability
+- Helps identify majority-class bias and probability drift during training
 
 Run the demo with:
 
@@ -250,7 +273,7 @@ Run the demo with:
 ./Release/main.exe
 ```
 
-The demo trains on user purchase behavior data (age and salary) to predict purchase decisions with 75-90% accuracy.
+The demo is designed to show realistic ML debugging: class imbalance, probability calibration, and decision-boundary learning rather than just raw accuracy.
 
 ## Next Steps
 
