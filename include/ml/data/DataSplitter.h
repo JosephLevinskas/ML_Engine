@@ -6,12 +6,13 @@ namespace machineLearning {
 
 struct DatasetSplit {
     Dataset train;
+    Dataset validation;
     Dataset test;
 };
 
 class DataSplitter {
 public:
-    static DatasetSplit split(const Dataset& data, double trainRatio);
+    static DatasetSplit split(const Dataset& data, double trainRatio, double valRatio, double testRatio);
 };
 
 }

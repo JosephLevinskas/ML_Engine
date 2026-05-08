@@ -8,14 +8,14 @@ namespace machineLearning {
 
 struct TrainingResults {
     LinearModel model;
-    std::vector<double> trainingObjectiveLosses; 
     std::vector<double> dataLosses; 
+    std::vector<double> trainingObjectiveLosses; 
 };
 
 struct LogisticTrainingResults {
     LogisticModel model;
-    std::vector<double> trainingObjectiveLosses; 
     std::vector<double> dataLosses; 
+    std::vector<double> trainingObjectiveLosses; 
 };
 
 class Trainer {

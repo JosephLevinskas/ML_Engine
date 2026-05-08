@@ -22,6 +22,6 @@ public:
 
     double operator()(size_t row, size_t col) const;
     double& operator()(size_t row, size_t col);
-
+    static std::vector<double> generateWeights(size_t size);
 };
 }

@@ -21,6 +21,8 @@ add_library(ml_core
     src/training/Gradients.cpp
     src/training/StandardScaler.cpp
     src/training/Trainer.cpp
+    src/layers/DenseLayer.cpp
+    src/activations/ReLUActivation.cpp
 )
 
 target_include_directories(ml_core

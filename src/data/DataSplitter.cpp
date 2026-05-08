@@ -6,9 +6,9 @@
 
 namespace machineLearning {
 
-DatasetSplit DataSplitter::split(const Dataset& data, double trainRatio) {
-    if (trainRatio <= 0.0 || trainRatio >= 1.0) {
-        throw std::invalid_argument("trainRatio must be between 0 and 1");
+DatasetSplit DataSplitter::split(const Dataset& data, double trainRatio, double valRatio, double testRatio) {
+    if (trainRatio <= 0.0 || valRatio < 0.0 || testRatio <= 0.0 || trainRatio + valRatio + testRatio != 1.0) {
+        throw std::invalid_argument("Ratios must be positive and sum to 1.0");
     }
 
     size_t n = data.features.rowCount();
@@ -27,14 +27,19 @@ DatasetSplit DataSplitter::split(const Dataset& data, double trainRatio) {
 
     
     size_t trainSize = static_cast<size_t>(n * trainRatio);
+    size_t valSize = static_cast<size_t>(n * valRatio);
+    size_t testSize = n - trainSize - valSize;
 
     std::vector<double> trainData;
+    std::vector<double> valData;
     std::vector<double> testData;
     std::vector<double> trainTargets;
+    std::vector<double> valTargets;
     std::vector<double> testTargets;
 
     trainData.reserve(trainSize * cols);
-    testData.reserve((n - trainSize) * cols);
+    valData.reserve(valSize * cols);
+    testData.reserve(testSize * cols);
 
     
     for (size_t i = 0; i < n; ++i) {
@@ -46,6 +51,12 @@ DatasetSplit DataSplitter::split(const Dataset& data, double trainRatio) {
                 trainData.push_back(data.features(idx, j));
             }
             trainTargets.push_back(data.targets[idx]);
+        } else if (i < trainSize + valSize) {
+            
+            for (size_t j = 0; j < cols; ++j) {
+                valData.push_back(data.features(idx, j));
+            }
+            valTargets.push_back(data.targets[idx]);
         } else {
             
             for (size_t j = 0; j < cols; ++j) {
@@ -60,12 +71,17 @@ DatasetSplit DataSplitter::split(const Dataset& data, double trainRatio) {
         Vector(std::move(trainTargets))
     };
 
+    Dataset valSet{
+        Matrix(valSize, cols, std::move(valData)),
+        Vector(std::move(valTargets))
+    };
+
     Dataset testSet{
-        Matrix(n - trainSize, cols, std::move(testData)),
+        Matrix(testSize, cols, std::move(testData)),
         Vector(std::move(testTargets))
     };
 
-    return {std::move(trainSet), std::move(testSet)};
+    return {std::move(trainSet), std::move(valSet), std::move(testSet)};
 }
 
 }
