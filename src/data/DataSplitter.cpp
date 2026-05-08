@@ -1,5 +1,6 @@
 #include "ml/data/DataSplitter.h"
 
+#include <cmath>
 #include <vector>
 #include <random>
 #include <stdexcept>
@@ -7,7 +8,8 @@
 namespace machineLearning {
 
 DatasetSplit DataSplitter::split(const Dataset& data, double trainRatio, double valRatio, double testRatio) {
-    if (trainRatio <= 0.0 || valRatio < 0.0 || testRatio <= 0.0 || trainRatio + valRatio + testRatio != 1.0) {
+    const double totalRatio = trainRatio + valRatio + testRatio;
+    if (trainRatio <= 0.0 || valRatio < 0.0 || testRatio <= 0.0 || std::abs(totalRatio - 1.0) > 1e-9) {
         throw std::invalid_argument("Ratios must be positive and sum to 1.0");
     }
 

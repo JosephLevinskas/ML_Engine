@@ -24,9 +24,25 @@ Vector ReLUActivation::forward(const Vector& input) {
     std::vector<double> maxRes(inputSize);
     
     for (size_t i = 0; i < inputSize; ++i) {
-        maxRes[i] = std::max(0.0, input[i]);
+        maxRes[i] = input[i] > 0.0 ? input[i] : 0.01 * input[i];
     }
     return Vector(std::move(maxRes));
+}
+
+Vector ReLUActivation::backward(const Vector& incomingGradient) {
+    if (incomingGradient.size() != inputCache.size()) {
+        throw std::invalid_argument("Incoming gradient size does not match ReLUActivation size");
+    }
+
+    std::vector<double> outputGradientData(incomingGradient.size());
+
+    for (size_t i = 0; i < incomingGradient.size(); ++i) {
+        outputGradientData[i] = inputCache[i] > 0.0
+    ? incomingGradient[i]
+    : 0.01 * incomingGradient[i];
+    }
+
+    return Vector(std::move(outputGradientData));
 }
 
 }

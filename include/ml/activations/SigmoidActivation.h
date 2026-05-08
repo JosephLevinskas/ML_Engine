@@ -4,15 +4,14 @@
 
 namespace machineLearning {
 
-class ReLUActivation {
+class SigmoidActivation {
 private:
     Vector inputCache;
 
 public:
-    explicit ReLUActivation(size_t inputSize);
+    explicit SigmoidActivation(size_t inputSize);
 
     Vector forward(const Vector& input);
-
     Vector backward(const Vector& incomingGradient);
 };
 }

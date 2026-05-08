@@ -9,6 +9,10 @@ class DenseLayer {
 private: 
     Matrix weights;
     Vector bias;
+
+    Matrix weightGradients;
+    Vector biasGradients;
+
     Vector inputCache;
 
 public:
@@ -18,5 +22,8 @@ public:
     const Vector& getBias() const;
 
     Vector forward(const Vector& input);
+    Vector backward(const Vector& incomingGradient);
+
+    void applyGradients(double learningRate);
 };
 }

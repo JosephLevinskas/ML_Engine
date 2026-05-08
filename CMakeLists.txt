@@ -23,6 +23,7 @@ add_library(ml_core
     src/training/Trainer.cpp
     src/layers/DenseLayer.cpp
     src/activations/ReLUActivation.cpp
+    src/activations/SigmoidActivation.cpp
 )
 
 target_include_directories(ml_core
